@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Real-Time Object Detection</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .upload-section {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        input[type="file"] {
+            margin: 15px 0;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        #preview {
+            display: block;
+            max-width: 100%;
+            max-height: 500px;
+            margin: 25px auto;
+            border-radius: 8px;
+        }
+
+        #status {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .results {
+            margin-top: 30px;
+        }
+
+        .detection {
+            background: #f1f5f9;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Real-Time Object Detection</h1>
+
+    <p class="subtitle">
+        YOLO + FastAPI + OpenCV
+    </p>
+
+    <div class="upload-section">
+
+        <input
+            type="file"
+            id="imageInput"
+            accept="image/*"
+        >
+
+        <br>
+
+        <button onclick="detectObject()">
+            Detect Objects
+        </button>
+
+    </div>
+
+    <p id="status"></p>
+
+    <img
+        id="preview"
+        class="hidden"
+        alt="Selected image"
+    >
+
+    <div
+        id="results"
+        class="results hidden"
+    >
+
+        <h2>Detection Results</h2>
+
+        <div id="detectionList"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const imageInput = document.getElementById("imageInput");
+
+const preview = document.getElementById("preview");
+
+const status = document.getElementById("status");
+
+const results = document.getElementById("results");
+
+const detectionList = document.getElementById("detectionList");
+
+
+imageInput.addEventListener("change", function () {
+
+    const file = imageInput.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    const imageURL = URL.createObjectURL(file);
+
+    preview.src = imageURL;
+
+    preview.classList.remove("hidden");
+
+});
+
+
+async function detectObject() {
+
+    const file = imageInput.files[0];
+
+    if (!file) {
+
+        status.textContent = "Please select an image first.";
+
+        return;
+    }
+
+
+    status.textContent = "Detecting objects...";
+
+    results.classList.add("hidden");
+
+    detectionList.innerHTML = "";
+
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:8000/predict",
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Server returned an error."
+            );
+
+        }
+
+
+        const data = await response.json();
+
+
+        status.textContent =
+            `Detected ${data.total_objects} object(s).`;
+
+
+        if (data.detections.length === 0) {
+
+            detectionList.innerHTML =
+                "<p>No objects detected.</p>";
+
+        } else {
+
+            data.detections.forEach(
+                (detection, index) => {
+
+                    const div =
+                        document.createElement("div");
+
+                    div.className = "detection";
+
+                    div.innerHTML = `
+                        <strong>
+                            Object ${index + 1}
+                        </strong>
+
+                        <br>
+
+                        Class:
+                        ${detection.class}
+
+                        <br>
+
+                        Confidence:
+                        ${(detection.confidence * 100).toFixed(2)}%
+
+                        <br>
+
+                        Bounding Box:
+                        ${detection.bounding_box
+                            .map(value => value.toFixed(2))
+                            .join(", ")}
+                    `;
+
+                    detectionList.appendChild(div);
+
+                }
+            );
+
+        }
+
+
+        results.classList.remove("hidden");
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        status.textContent =
+            "Error connecting to the FastAPI server.";
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>

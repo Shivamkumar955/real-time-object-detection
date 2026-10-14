@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Real-Time Object Detection</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        video {
+            width: 100%;
+            max-width: 700px;
+            border-radius: 10px;
+            background: black;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        button {
+            margin: 10px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #results {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .detection {
+            background: #f1f5f9;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="container">
+
+        <h1>Real-Time Object Detection</h1>
+
+        <p class="subtitle">
+            YOLO + FastAPI + OpenCV
+        </p>
+
+
+        <video
+            id="webcam"
+            autoplay
+            playsinline
+        ></video>
+
+
+        <canvas id="canvas"></canvas>
+
+
+        <br>
+
+
+        <button onclick="startWebcam()">
+            Start Webcam
+        </button>
+
+
+        <button onclick="detectFrame()">
+            Detect Objects
+        </button>
+
+
+        <p id="status">
+            Webcam is not started.
+        </p>
+
+
+        <div id="results"></div>
+
+    </div>
+
+
+    <script>
+
+        const video =
+            document.getElementById("webcam");
+
+        const canvas =
+            document.getElementById("canvas");
+
+        const status =
+            document.getElementById("status");
+
+        const results =
+            document.getElementById("results");
+
+
+        async function startWebcam() {
+
+            try {
+
+                const stream =
+                    await navigator.mediaDevices.getUserMedia({
+                        video: true
+                    });
+
+                video.srcObject = stream;
+
+                status.textContent =
+                    "Webcam started successfully.";
+
+            }
+
+            catch (error) {
+
+                console.error(error);
+
+                status.textContent =
+                    "Could not access webcam.";
+
+            }
+
+        }
+
+
+        async function detectFrame() {
+
+            if (!video.srcObject) {
+
+                status.textContent =
+                    "Start the webcam first.";
+
+                return;
+
+            }
+
+
+            status.textContent =
+                "Detecting objects...";
+
+
+            canvas.width =
+                video.videoWidth;
+
+            canvas.height =
+                video.videoHeight;
+
+
+            const context =
+                canvas.getContext("2d");
+
+
+            context.drawImage(
+                video,
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+
+            canvas.toBlob(
+                async function(blob) {
+
+                    const formData =
+                        new FormData();
+
+                    formData.append(
+                        "file",
+                        blob,
+                        "webcam.jpg"
+                    );
+
+
+                    try {
+
+                        const response =
+                            await fetch(
+                                "http://127.0.0.1:8000/predict",
+                                {
+                                    method: "POST",
+                                    body: formData
+                                }
+                            );
+
+
+                        const data =
+                            await response.json();
+
+
+                        status.textContent =
+                            `Detected ${data.total_objects} object(s).`;
+
+
+                        results.innerHTML = "";
+
+
+                        data.detections.forEach(
+                            (detection, index) => {
+
+                                const div =
+                                    document.createElement("div");
+
+                                div.className =
+                                    "detection";
+
+
+                                div.innerHTML = `
+                                    <strong>
+                                        Object ${index + 1}
+                                    </strong>
+                                    <br>
+                                    Class:
+                                    ${detection.class}
+                                    <br>
+                                    Confidence:
+                                    ${(detection.confidence * 100).toFixed(2)}%
+                                    <br>
+                                    Bounding Box:
+                                    ${detection.bounding_box
+                                        .map(value => value.toFixed(2))
+                                        .join(", ")}
+                                `;
+
+
+                                results.appendChild(div);
+
+                            }
+                        );
+
+
+                    }
+
+                    catch (error) {
+
+                        console.error(error);
+
+                        status.textContent =
+                            "Error connecting to FastAPI.";
+
+                    }
+
+                },
+                "image/jpeg"
+            );
+
+        }
+
+    </script>
+
+</body>
+
+</html>
