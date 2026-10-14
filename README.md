@@ -1,396 +1,222 @@
-\# Real-Time Object Detection System
 
+# Real-Time Object Detection System
 
+A computer vision application that detects and classifies objects in uploaded images using YOLO11, Python, OpenCV, and FastAPI. It provides a web interface to upload images and view detected object classes, confidence scores, and bounding-box coordinates.
 
-A computer vision project that detects and classifies objects in images using \*\*YOLO, OpenCV, Python, and FastAPI\*\*. The application provides a web interface for uploading images and viewing detection results, including object classes, confidence scores, and bounding-box coordinates.
+## Features
 
+- **YOLO-based object detection:** Detects supported object classes in images.
+- **Image upload:** Upload images through a web interface.
+- **Confidence scores:** Displays confidence for each detection.
+- **Bounding-box coordinates:** Returns the coordinates of detected objects.
+- **REST API:** Provides image inference through FastAPI.
+- **Swagger documentation:** Test the API using the interactive documentation.
+- **Web interface:** HTML, CSS, and JavaScript frontend.
+- **Input validation:** Returns an error for invalid image files.
+- **Optional webcam detection:** Run a separate Python script for live camera detection.
 
-
-\## Features
-
-
-
-\- \*\*YOLO-based detection:\*\* Identifies objects in uploaded images.
-
-\- \*\*Image upload:\*\* Select an image through a simple web interface.
-
-\- \*\*Confidence scores:\*\* Displays the model's confidence for each detection.
-
-\- \*\*Bounding boxes:\*\* Returns the coordinates of detected objects.
-
-\- \*\*REST API:\*\* Provides an endpoint for image inference using FastAPI.
-
-\- \*\*Interactive API documentation:\*\* Test endpoints through Swagger UI.
-
-\- \*\*Web interface:\*\* Built with HTML, CSS, and JavaScript.
-
-\- \*\*Input validation:\*\* Returns an error for invalid image files.
-
-
-
-\## Technology Stack
-
-
+## Technology Stack
 
 | Technology | Purpose |
-
 |---|---|
-
 | Python | Main programming language |
-
-| YOLO11 (Ultralytics) | Object detection model |
-
+| YOLO11 (Ultralytics) | Object detection |
 | OpenCV | Image processing |
-
 | NumPy | Image-array processing |
-
 | FastAPI | REST API backend |
-
-| Uvicorn | API server |
-
+| Uvicorn | ASGI server |
 | HTML, CSS, JavaScript | Frontend interface |
 
-
-
-\## Project Structure
-
-
+## Project Structure
 
 ```text
-
 real-time-object-detection/
-
 ├── backend/
-
 │   ├── main.py
-
 │   ├── detector.py
-
-│   ├── test\_yolo.py
-
+│   ├── test_yolo.py
 │   └── webcam.py
-
 ├── data/
-
-│   ├── images/
-
-│   └── videos/
-
+│   └── images/
+│       └── test.jpg
 ├── frontend/
-
 │   ├── index.html
-
 │   └── webcam.html
-
-├── models/
-
 ├── outputs/
-
-├── tests/
-
+├── bus.jpg
 ├── requirements.txt
-
 ├── .gitignore
-
 └── README.md
-
 ```
 
+## Prerequisites
 
+- Python 3.11 recommended
+- Git
+- Visual Studio Code or another code editor
+- Internet connection to install dependencies and download the model
 
-\## Prerequisites
+## Installation
 
-
-
-\- Python 3.11 recommended
-
-\- Git
-
-\- Visual Studio Code or another code editor
-
-\- Internet connection for installing dependencies and downloading the model
-
-
-
-\## Installation
-
-
-
-\### 1. Clone the repository
-
-
+### 1. Clone the repository
 
 ```bash
-
-git clone https://github.com/YOUR-USERNAME/real-time-object-detection.git
-
+git clone https://github.com/Shivamkumar955/real-time-object-detection.git
 cd real-time-object-detection
-
 ```
 
+### 2. Create a virtual environment
 
-
-Replace `YOUR-USERNAME` with your GitHub username.
-
-
-
-\### 2. Create a virtual environment
-
-
-
-Windows PowerShell:
-
-
+For Windows PowerShell:
 
 ```powershell
-
 py -3.11 -m venv venv
-
-.\\venv\\Scripts\\Activate.ps1
-
 ```
 
-
-
-\### 3. Install dependencies
-
-
+Activate it:
 
 ```powershell
+.\venv\Scripts\Activate.ps1
+```
 
+If the virtual environment already exists, activate it instead of creating it again.
+
+### 3. Install dependencies
+
+```powershell
 python -m pip install --upgrade pip
-
 pip install -r requirements.txt
-
 ```
 
+### 4. Download the YOLO model
 
-
-\### 4. Download the YOLO model
-
-
-
-The trained model file is not included in the repository. Download the official Ultralytics YOLO11 nano model:
-
-
+The `yolo11n.pt` model file may not be included in the Git repository. Download it with:
 
 ```powershell
-
 python -c "from ultralytics import YOLO; YOLO('yolo11n.pt')"
-
 ```
 
+## Run the Application
 
+Keep the backend and frontend running in separate terminals.
 
-The model will be downloaded to the working directory when required by the code.
-
-
-
-\## Run the Application
-
-
-
-\### 1. Start the backend
-
-
+### 1. Start the backend API
 
 From the project root, run:
 
-
-
 ```powershell
-
 uvicorn backend.main:app --reload
-
 ```
-
-
 
 Backend URL: http://127.0.0.1:8000
 
+Interactive API documentation: http://127.0.0.1:8000/docs
 
+The root endpoint can be checked at http://127.0.0.1:8000/
 
-Swagger API documentation: http://127.0.0.1:8000/docs
+### 2. Start the frontend
 
-
-
-Health check: http://127.0.0.1:8000/health
-
-
-
-\### 2. Start the frontend
-
-
-
-Open a second terminal from the project root and run:
-
-
+Open a second terminal in the project root and run:
 
 ```powershell
-
 python -m http.server 5500 --directory frontend
-
 ```
 
-
-
-Open the image detection interface in your browser:
-
-
+Open the image detection page in your browser:
 
 http://127.0.0.1:5500/index.html
 
+### 3. Detect objects in an image
 
+1. Click **Choose File**.
+2. Select an image from your computer.
+3. Click **Detect Objects**.
+4. View the detected object classes, confidence scores, and bounding-box coordinates.
 
-\### 3. Detect objects
+The image detection web interface does not require a webcam.
 
+## API Reference
 
-
-1\. Select an image using the file-upload control.
-
-2\. Click \*\*Detect Objects\*\*.
-
-3\. View the detected classes, confidence scores, and bounding-box coordinates.
-
-
-
-\## API Reference
-
-
-
-\### `GET /`
-
-
+### `GET /`
 
 Checks whether the API is running.
 
+### `POST /predict`
 
+Accepts an image using `multipart/form-data` and returns detected objects.
 
-\### `GET /health`
-
-
-
-Returns the API health status.
-
-
-
-\### `POST /predict`
-
-
-
-Accepts an image uploaded as multipart form data.
-
-
-
-Example successful response:
-
-
+Example response:
 
 ```json
-
 {
-
-&#x20; "filename": "test.jpg",
-
-&#x20; "total\_objects": 1,
-
-&#x20; "detections": \[
-
-&#x20;   {
-
-&#x20;     "class": "bus",
-
-&#x20;     "confidence": 0.9422,
-
-&#x20;     "bounding\_box": \[
-
-&#x20;       38.14,
-
-&#x20;       11.39,
-
-&#x20;       530.03,
-
-&#x20;       335.21
-
-&#x20;     ]
-
-&#x20;   }
-
-&#x20; ]
-
+  "filename": "test.jpg",
+  "detections": [
+    {
+      "class": "bus",
+      "confidence": 0.9422,
+      "bounding_box": [
+        38.14,
+        11.39,
+        530.03,
+        335.21
+      ]
+    }
+  ],
+  "total_objects": 1
 }
-
 ```
 
+This is an illustrative example. Actual results depend on the image and model predictions.
 
+## Run Image Detection from Python
 
-The example is illustrative of a previous test result; actual detections depend on the input image.
-
-
-
-\## Testing
-
-
-
-Run the image detection test from the project root:
-
-
+From the project root, run:
 
 ```powershell
-
-python backend/test\_yolo.py
-
+python backend/test_yolo.py
 ```
 
+The script uses the YOLO model to detect objects in the configured test image and saves an annotated image to the output location configured in the script.
 
+## Optional: Run Webcam Detection
 
-The webcam script is available separately:
-
-
+To run live detection using an accessible webcam:
 
 ```powershell
-
 python backend/webcam.py
-
 ```
 
+This optional script requires a working camera. It is not required for image-upload detection.
 
+## Troubleshooting
 
-The webcam script requires an accessible camera. The image-upload web interface does not require a webcam.
+- **API connection error:** Make sure the backend is running at `http://127.0.0.1:8000`.
+- **Frontend page unavailable:** Make sure the frontend server is running on port `5500`.
+- **Model file missing:** Download `yolo11n.pt` using the command in the installation section.
+- **Dependency errors:** Activate the virtual environment and install packages from `requirements.txt`.
+- **CORS error:** Configure FastAPI CORS middleware to allow the local frontend origin, `http://127.0.0.1:5500`.
 
+## Future Improvements
 
+- Display bounding boxes directly on the uploaded image.
+- Add object counts grouped by class.
+- Support video-file detection through the web interface.
+- Add detection history and downloadable reports.
+- Evaluate model performance using precision, recall, F1-score, and inference latency.
+- Deploy the application to a cloud platform.
 
-\## Future Improvements
+## Learning Outcomes
 
+This project demonstrates practical experience with computer vision, pretrained object-detection models, image processing, REST API development, and frontend-backend integration.
 
+## Project Repository
 
-\- Display bounding boxes directly on the uploaded image.
+**GitHub:** [Real-Time Object Detection System](https://github.com/Shivamkumar955/real-time-object-detection)
 
-\- Add object-count summaries by class.
+**API documentation (local):** http://127.0.0.1:8000/docs
 
-\- Support video-file detection through the web interface.
+**Web application (local):** http://127.0.0.1:5500/index.html
 
-\- Add detection history and downloadable reports.
+## License
 
-\- Improve inference performance and add evaluation metrics.
-
-\- Deploy the application to a cloud platform.
-
-
-
-\## Learning Outcomes
-
-
-
-This project demonstrates practical experience with computer vision, pretrained object-detection models, image processing, REST API development, frontend-backend integration, and Python application development.
-
-
-
-\## License
-
-
-
-Choose and add an appropriate open-source license before distributing the project.
-
-
-
+No open-source license has been specified yet. Add a license file if you intend to distribute the project under a particular open-source license.
