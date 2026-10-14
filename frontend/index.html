@@ -1,285 +1,686 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Real-Time Object Detection</title>
+    <title>VisionAI | Object Detection</title>
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --bg: #f5f7ff;
+            --text: #172033;
+            --muted: #64748b;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --success: #059669;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
-        .container {
-            width: 90%;
-            max-width: 900px;
-            margin: 40px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        body {
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background:
+                radial-gradient(circle at top left, #e0e7ff, transparent 38%),
+                var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 20px 7%;
+            background: rgba(255, 255, 255, 0.85);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 21px;
+            font-weight: 800;
+        }
+
+        .logo {
+            display: grid;
+            place-items: center;
+            width: 44px;
+            height: 44px;
+            color: white;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            font-size: 23px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--success);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            background: #10b981;
+            border-radius: 50%;
+        }
+
+        main {
+            width: min(1100px, 92%);
+            margin: 52px auto;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            padding: 7px 13px;
+            border: 1px solid #c7d2fe;
+            border-radius: 30px;
+            background: #eef2ff;
+            color: var(--primary-dark);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
         }
 
         h1 {
-            text-align: center;
-            margin-bottom: 10px;
+            font-size: clamp(32px, 5vw, 49px);
+            line-height: 1.15;
+            letter-spacing: -1.8px;
+            margin-bottom: 15px;
         }
 
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
+        .gradient-text {
+            color: var(--primary);
         }
 
-        .upload-section {
+        .hero p {
+            max-width: 650px;
+            margin: 0 auto;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            padding: 21px;
             text-align: center;
-            margin-bottom: 25px;
+            box-shadow: 0 6px 20px rgba(30, 41, 59, 0.04);
+        }
+
+        .stat-value {
+            font-size: 27px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 27px;
+            box-shadow: 0 12px 35px rgba(30, 41, 59, 0.06);
+            min-width: 0;
+        }
+
+        .panel h2 {
+            font-size: 19px;
+            margin-bottom: 8px;
+        }
+
+        .panel-description {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 22px;
+        }
+
+        .upload-area {
+            border: 2px dashed #c7d2fe;
+            background: #f8faff;
+            border-radius: 17px;
+            padding: 30px 18px;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: #f0f3ff;
+        }
+
+        .upload-icon {
+            font-size: 37px;
+            margin-bottom: 12px;
+        }
+
+        .upload-area p {
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        .upload-area small {
+            color: var(--muted);
+            font-size: 12px;
         }
 
         input[type="file"] {
-            margin: 15px 0;
+            width: 100%;
+            margin-top: 18px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        input[type="file"]::file-selector-button {
+            background: #e0e7ff;
+            color: #4338ca;
+            border: 0;
+            border-radius: 8px;
+            padding: 10px 13px;
+            margin-right: 10px;
+            cursor: pointer;
+            font-weight: 700;
         }
 
         button {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 6px;
+            border: 0;
+            border-radius: 11px;
+            padding: 14px 18px;
+            font-size: 14px;
+            font-weight: 750;
             cursor: pointer;
-            font-size: 16px;
+            transition: transform 0.2s, background 0.2s;
         }
 
         button:hover {
-            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+            transform: none;
+        }
+
+        .primary-button {
+            width: 100%;
+            margin-top: 18px;
+            color: white;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            box-shadow: 0 7px 15px rgba(99, 102, 241, 0.2);
+        }
+
+        .primary-button:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #7c3aed);
+        }
+
+        .secondary-button {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        #status {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-top: 15px;
+            overflow-wrap: anywhere;
+        }
+
+        #status.error {
+            color: #dc2626;
+        }
+
+        #status.success {
+            color: var(--success);
+        }
+
+        .preview-box {
+            display: grid;
+            place-items: center;
+            min-height: 280px;
+            padding: 12px;
+            border-radius: 15px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            overflow: hidden;
         }
 
         #preview {
             display: block;
             max-width: 100%;
-            max-height: 500px;
-            margin: 25px auto;
-            border-radius: 8px;
+            max-height: 360px;
+            object-fit: contain;
+            border-radius: 10px;
         }
 
-        #status {
+        .empty-state {
             text-align: center;
-            margin-top: 20px;
-            font-weight: bold;
+            color: #94a3b8;
+            font-size: 13px;
+            line-height: 1.8;
         }
 
         .results {
-            margin-top: 30px;
+            margin-top: 23px;
+        }
+
+        .results-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .results-heading h3 {
+            font-size: 16px;
+        }
+
+        .count-badge {
+            background: #dcfce7;
+            color: #166534;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
         }
 
         .detection {
-            background: #f1f5f9;
             padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            margin-bottom: 10px;
+            background: #fff;
+        }
+
+        .detection-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 13px;
+        }
+
+        .class-name {
+            text-transform: capitalize;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .confidence {
+            color: var(--success);
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .progress-track {
+            height: 7px;
+            border-radius: 10px;
+            background: #e2e8f0;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            border-radius: inherit;
+        }
+
+        .coordinates {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
         }
 
         .hidden {
-            display: none;
+            display: none !important;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 12px;
+            padding: 15px 20px 35px;
+        }
+
+        @media (max-width: 760px) {
+            header {
+                padding: 16px 5%;
+            }
+
+            .brand {
+                font-size: 16px;
+            }
+
+            .status {
+                font-size: 11px;
+            }
+
+            main {
+                margin: 32px auto;
+            }
+
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                gap: 9px;
+            }
+
+            .stat-card {
+                padding: 16px 8px;
+            }
+
+            .stat-value {
+                font-size: 22px;
+            }
+
+            .stat-label {
+                font-size: 11px;
+            }
+
+            .panel {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 
 <body>
-
-<div class="container">
-
-    <h1>Real-Time Object Detection</h1>
-
-    <p class="subtitle">
-        YOLO + FastAPI + OpenCV
-    </p>
-
-    <div class="upload-section">
-
-        <input
-            type="file"
-            id="imageInput"
-            accept="image/*"
-        >
-
-        <br>
-
-        <button onclick="detectObject()">
-            Detect Objects
-        </button>
-
+<header>
+    <div class="brand">
+        <div class="logo">✦</div>
+        <span>VisionAI <span class="gradient-text">Detector</span></span>
     </div>
 
-    <p id="status"></p>
-
-    <img
-        id="preview"
-        class="hidden"
-        alt="Selected image"
-    >
-
-    <div
-        id="results"
-        class="results hidden"
-    >
-
-        <h2>Detection Results</h2>
-
-        <div id="detectionList"></div>
-
+    <div class="status">
+        <span class="status-dot"></span>
+        AI Detection Interface
     </div>
+</header>
 
-</div>
+<main>
+    <section class="hero">
+        <div class="eyebrow">COMPUTER VISION PROJECT</div>
+        <h1>See the world <span class="gradient-text">differently.</span></h1>
+        <p>
+            Upload an image and let YOLO identify objects in seconds.
+            Explore detection labels, confidence scores, and bounding-box coordinates.
+        </p>
+    </section>
 
+    <section class="stats">
+        <div class="stat-card">
+            <div class="stat-value">YOLO11</div>
+            <div class="stat-label">Detection Model</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">REST</div>
+            <div class="stat-label">FastAPI Backend</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="totalStat">0</div>
+            <div class="stat-label">Objects in Last Run</div>
+        </div>
+    </section>
+
+    <section class="workspace">
+        <div class="panel">
+            <h2>Upload an image</h2>
+            <p class="panel-description">
+                Choose a JPG, PNG, or other supported image to start detection.
+            </p>
+
+            <div class="upload-area">
+                <div class="upload-icon">📷</div>
+                <p>Choose an image to analyze</p>
+                <small>Your image will be processed by the local API.</small>
+
+                <input
+                    type="file"
+                    id="imageInput"
+                    accept="image/*"
+                >
+            </div>
+
+            <button class="primary-button" id="detectButton" type="button">
+                ✨ Detect Objects
+            </button>
+
+            <p id="status" role="status" aria-live="polite">
+                Ready. Select an image to begin.
+            </p>
+        </div>
+
+        <div class="panel">
+            <h2>Image preview</h2>
+            <p class="panel-description">
+                Preview your selected image before sending it for detection.
+            </p>
+
+            <div class="preview-box">
+                <p id="emptyState" class="empty-state">
+                    🖼️<br>
+                    Your selected image will appear here.
+                </p>
+                <img id="preview" class="hidden" alt="Selected image preview">
+            </div>
+
+            <section id="results" class="results hidden">
+                <div class="results-heading">
+                    <h3>Detection results</h3>
+                    <span id="countBadge" class="count-badge">0 objects</span>
+                </div>
+                <div id="detectionList"></div>
+            </section>
+        </div>
+    </section>
+</main>
+
+<footer>
+    Built with Python · YOLO11 · OpenCV · FastAPI
+</footer>
 
 <script>
+    const API_URL = "http://127.0.0.1:8000/predict";
 
-const imageInput = document.getElementById("imageInput");
+    const imageInput = document.getElementById("imageInput");
+    const preview = document.getElementById("preview");
+    const emptyState = document.getElementById("emptyState");
+    const statusText = document.getElementById("status");
+    const detectButton = document.getElementById("detectButton");
+    const results = document.getElementById("results");
+    const detectionList = document.getElementById("detectionList");
+    const totalStat = document.getElementById("totalStat");
+    const countBadge = document.getElementById("countBadge");
 
-const preview = document.getElementById("preview");
+    let previewUrl = null;
 
-const status = document.getElementById("status");
-
-const results = document.getElementById("results");
-
-const detectionList = document.getElementById("detectionList");
-
-
-imageInput.addEventListener("change", function () {
-
-    const file = imageInput.files[0];
-
-    if (!file) {
-        return;
+    function setStatus(message, type = "") {
+        statusText.textContent = message;
+        statusText.className = type;
     }
 
-    const imageURL = URL.createObjectURL(file);
+    imageInput.addEventListener("change", () => {
+        const file = imageInput.files[0];
 
-    preview.src = imageURL;
+        if (!file) return;
 
-    preview.classList.remove("hidden");
+        if (!file.type.startsWith("image/")) {
+            setStatus("Please select a valid image file.", "error");
+            imageInput.value = "";
+            return;
+        }
 
-});
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+        }
 
+        previewUrl = URL.createObjectURL(file);
+        preview.src = previewUrl;
+        preview.classList.remove("hidden");
+        emptyState.classList.add("hidden");
 
-async function detectObject() {
+        results.classList.add("hidden");
+        detectionList.replaceChildren();
+        totalStat.textContent = "0";
 
-    const file = imageInput.files[0];
+        setStatus(`Selected: ${file.name}`);
+    });
 
-    if (!file) {
+    detectButton.addEventListener("click", async () => {
+        const file = imageInput.files[0];
 
-        status.textContent = "Please select an image first.";
+        if (!file) {
+            setStatus("Please choose an image first.", "error");
+            return;
+        }
 
-        return;
-    }
+        const formData = new FormData();
+        formData.append("file", file);
 
+        detectButton.disabled = true;
+        detectButton.textContent = "⏳ Detecting...";
+        results.classList.add("hidden");
+        detectionList.replaceChildren();
+        setStatus("Sending image to the YOLO detection API...");
 
-    status.textContent = "Detecting objects...";
-
-    results.classList.add("hidden");
-
-    detectionList.innerHTML = "";
-
-
-    const formData = new FormData();
-
-    formData.append("file", file);
-
-
-    try {
-
-        const response = await fetch(
-            "http://127.0.0.1:8000/predict",
-            {
+        try {
+            const response = await fetch(API_URL, {
                 method: "POST",
                 body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || `API error: ${response.status}`);
             }
-        );
 
+            const detections = Array.isArray(data.detections)
+                ? data.detections
+                : [];
 
-        if (!response.ok) {
+            totalStat.textContent = data.total_objects ?? detections.length;
+            countBadge.textContent =
+                `${detections.length} object${detections.length === 1 ? "" : "s"}`;
 
-            throw new Error(
-                "Server returned an error."
+            if (detections.length === 0) {
+                const message = document.createElement("p");
+                message.className = "empty-state";
+                message.textContent = "No objects detected in this image.";
+                detectionList.appendChild(message);
+            }
+
+            detections.forEach((item, index) => {
+                const card = document.createElement("article");
+                card.className = "detection";
+
+                const top = document.createElement("div");
+                top.className = "detection-top";
+
+                const name = document.createElement("span");
+                name.className = "class-name";
+                name.textContent = `${index + 1}. ${item.class}`;
+
+                const confidence = document.createElement("span");
+                confidence.className = "confidence";
+                confidence.textContent =
+                    `${(Number(item.confidence) * 100).toFixed(2)}%`;
+
+                top.append(name, confidence);
+
+                const track = document.createElement("div");
+                track.className = "progress-track";
+
+                const fill = document.createElement("div");
+                fill.className = "progress-fill";
+                const percentage = Math.max(
+                    0,
+                    Math.min(100, Number(item.confidence) * 100)
+                );
+                fill.style.width = `${percentage}%`;
+                track.appendChild(fill);
+
+                const coordinates = document.createElement("p");
+                coordinates.className = "coordinates";
+                coordinates.textContent =
+                    "Bounding box: " +
+                    (Array.isArray(item.bounding_box)
+                        ? item.bounding_box
+                            .map(value => Number(value).toFixed(1))
+                            .join(", ")
+                        : "Unavailable");
+
+                card.append(top, track, coordinates);
+                detectionList.appendChild(card);
+            });
+
+            results.classList.remove("hidden");
+            setStatus("Detection completed successfully.", "success");
+
+        } catch (error) {
+            console.error("Detection error:", error);
+
+            setStatus(
+                "Could not connect to the API. Ensure FastAPI is running at " +
+                "http://127.0.0.1:8000 and CORS is configured.",
+                "error"
             );
-
+        } finally {
+            detectButton.disabled = false;
+            detectButton.textContent = "✨ Detect Objects";
         }
+    });
 
-
-        const data = await response.json();
-
-
-        status.textContent =
-            `Detected ${data.total_objects} object(s).`;
-
-
-        if (data.detections.length === 0) {
-
-            detectionList.innerHTML =
-                "<p>No objects detected.</p>";
-
-        } else {
-
-            data.detections.forEach(
-                (detection, index) => {
-
-                    const div =
-                        document.createElement("div");
-
-                    div.className = "detection";
-
-                    div.innerHTML = `
-                        <strong>
-                            Object ${index + 1}
-                        </strong>
-
-                        <br>
-
-                        Class:
-                        ${detection.class}
-
-                        <br>
-
-                        Confidence:
-                        ${(detection.confidence * 100).toFixed(2)}%
-
-                        <br>
-
-                        Bounding Box:
-                        ${detection.bounding_box
-                            .map(value => value.toFixed(2))
-                            .join(", ")}
-                    `;
-
-                    detectionList.appendChild(div);
-
-                }
-            );
-
-        }
-
-
-        results.classList.remove("hidden");
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        status.textContent =
-            "Error connecting to the FastAPI server.";
-
-    }
-
-}
-
+    window.addEventListener("beforeunload", () => {
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+    });
 </script>
-
 </body>
 </html>
